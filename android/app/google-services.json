@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "803454626765",
+    "firebase_url": "https://shakugo-219f5.firebaseio.com",
+    "project_id": "shakugo-219f5",
+    "storage_bucket": "shakugo-219f5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:803454626765:android:d026d569b555a6bdd43284",
+        "android_client_info": {
+          "package_name": "com.shakugo.spajam_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "803454626765-9usgevg3npeh4rrt20a6vipdq3uvd5n0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7IyanC2smnO7SFRJ181xlSaaUg48pGvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "803454626765-9usgevg3npeh4rrt20a6vipdq3uvd5n0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
