@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:spajam_app/detail.dart';
 
 class CalenderApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Calendar',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: CalenderPage(),
-    );
+    return CalenderPage();
   }
 }
 
@@ -75,7 +70,7 @@ class _CalenderPageState extends State<CalenderPage> {
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('観察日記'),
+        title: Text('かれんだー'),
         centerTitle: true,
       ),
       body: Column(
@@ -144,9 +139,13 @@ class _CalenderPageState extends State<CalenderPage> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: ListTile(
-                  title: Text(event.toString()),
-                  onTap: () => print('$event tapped!'),
-                ),
+                    title: Text(event.toString()),
+                    onTap: () {
+                      print('$event tapped!');
+                      Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => DetailPage(text: event),
+                      ));
+                    }),
               ))
           .toList(),
     );
