@@ -67,7 +67,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Image Picker'),
+        title: Text('しゃしんをあげよう！'),
       ),
       body: Center(
         child: Column(
@@ -79,8 +79,12 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 width: 300,
                 child: Image.file(file),
               ),
-            RaisedButton(
-              child: Text('upload'),
+            RaisedButton.icon(
+              //child: Text('upload'),
+              icon: Icon(Icons.local_florist),
+              color: Colors.green,
+              textColor: Colors.white,
+              label: Text("いまのあさがおをみせて！"),
               onPressed: () {
                 showBottomSheet();
               },
