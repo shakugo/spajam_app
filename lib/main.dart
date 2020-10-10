@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:spajam_app/calender.dart';
+import 'package:spajam_app/uploadPicture.dart';
 
 void main() {
   runApp(MyApp());
@@ -83,7 +84,11 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.black,
               size: 40.0,
             ),
-            onPressed: () => print("camera")),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => ImageUploadScreen(),
+              ));
+            }),
         IconButton(
             icon: Icon(
               Icons.event_note,
