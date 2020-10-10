@@ -79,8 +79,8 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 width: 300,
                 child: Image.file(file),
               ),
-            RaisedButton.icon(
-              //child: Text('upload'),
+            if(file == null)
+              RaisedButton.icon(
               icon: Icon(Icons.local_florist),
               color: Colors.green,
               textColor: Colors.white,
@@ -88,7 +88,28 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
               onPressed: () {
                 showBottomSheet();
               },
-            )
+            ),
+            if(file != null)
+              RaisedButton.icon(
+                icon: Icon(Icons.file_upload),
+                color: Colors.red,
+                textColor: Colors.white,
+                label: Text("みんなにもみせよう！！"),
+                onPressed: () {
+                  //ここにアップロードするときのこれこれ書いてくれや
+                  print("upload");
+                },
+              ),
+            if(file != null)
+              RaisedButton.icon(
+                icon: Icon(Icons.local_florist),
+                color: Colors.green,
+                textColor: Colors.white,
+                label: Text("ちがうしゃしんにする！"),
+                onPressed: () {
+                  showBottomSheet();
+                },
+              )
           ],
         ),
       ),
