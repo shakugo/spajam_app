@@ -1,4 +1,4 @@
-package com.shakugo.spajam_app.spajam_app
+package com.shakugo.spajam_app
 
 import io.flutter.embedding.android.FlutterActivity
 
