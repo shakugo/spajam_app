@@ -84,14 +84,17 @@ class MyHomePage extends StatelessWidget {
       builder: (context, snapshot) {
         if (!snapshot.hasData) return LinearProgressIndicator();
 
-        return _buildContent(context, snapshot.data.documents[0]);
+        return _buildContent(context, snapshot.data.documents[0],
+            snapshot.data.documents[snapshot.data.documents.length - 1]);
       },
     );
   }
 
-  Widget _buildContent(BuildContext context, DocumentSnapshot data) {
+  Widget _buildContent(
+      BuildContext context, DocumentSnapshot data, DocumentSnapshot lastData) {
     final diary = Diary.fromSnapshot(data);
-    var _duration = DateTime.now().difference(diary.date).inDays;
+    final lastDiary = Diary.fromSnapshot(lastData);
+    var _duration = DateTime.now().difference(lastDiary.date).inDays;
     var _durationMessage = '';
     if (_duration < 0) {
       _durationMessage = '今日から';
