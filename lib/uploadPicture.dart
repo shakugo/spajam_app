@@ -3,7 +3,10 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
-
+import 'dart:typed_data';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class ImageUploadScreen extends StatefulWidget {
   @override
@@ -95,6 +98,52 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
     );
   }
 }
+_requestCloudVision(File cameraImage) async {
+  String url = "https://vision.googleapis.com/v1/images:annotate";
+  String apiKey = "AIzaSyD0Vj6zMMgN84NGGsQr92LvdQ5z3YmdNTM";
+  List<int> imageBytes = cameraImage.readAsBytesSync();
+  Map json = {
+    "requests": [
+      {
+        "image": {"content": base64Encode(imageBytes)},
+        "features": [
+          {
+            "type": "LABEL_DETECTION",
+            "maxResults": 10,
+            "model": "builtin/stable"
+          }
+        ],
+        "imageContext": {"languageHints": []}
+      }
+    ]
+  };
+
+  Response response = await http.post(url + "?key=" + apiKey,
+      body: jsonEncode(json), headers: {"Content-Type": "application/json"});
+
+  var body = response.body;
+  //visionapiのレスポンス中身出力
+  print(body);
+
+  int score = 0;
+
+  if(body.contains("Flower")){
+    print("flower exists");
+    score+=5;
+  }else if (body.contains("Petal")){
+    print("petal exists");
+    score+=4;
+  }else if (body.contains("Leaf")){
+    print("leaf exists");
+    score+=3;
+  }else {
+    print("none!!!!!!!!!!!!!");
+  }
+
+  print(score);
+
+  return score;
+}
 
 //カメラ、ギャラリーからのアップロードはここでやる
 class ImageUpload {
@@ -106,6 +155,7 @@ class ImageUpload {
   Future<File> getImageFromDevice() async {
     // 撮影/選択したFileが返ってくる
     final imageFile = await ImagePicker().getImage(source: source);
+
     // Androidで撮影せずに閉じた場合はnullになる
     if (imageFile == null) {
       return null;
@@ -114,6 +164,9 @@ class ImageUpload {
     final File compressedFile = await FlutterNativeImage.compressImage(
         imageFile.path,
         quality: quality);
+
+    _requestCloudVision(compressedFile);
+    
 
     return compressedFile;
   }
