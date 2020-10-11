@@ -17,6 +17,9 @@ class ImageUploadScreen extends StatefulWidget {
 class _ImageUploadScreenState extends State<ImageUploadScreen> {
   File file;
   int score;
+  double width = 300.0;
+  double height = 50.0;
+  double fontSize = 20.0;
 
   Future<int> showCupertinoBottomBar() {
     //選択するためのボトムシートを表示
@@ -86,38 +89,64 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 child: Image.file(file),
               ),
             if (file == null)
-              RaisedButton.icon(
-                icon: Icon(Icons.local_florist),
-                color: Colors.green,
-                textColor: Colors.white,
-                label: Text("いまのあさがおをみせて！"),
-                onPressed: () {
-                  showBottomSheet();
-                },
+              SizedBox(
+                width: width,
+                height: height,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.local_florist),
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  label: Text(
+                    "いまのあさがおをみせて！",
+                    style: new TextStyle(
+                      fontSize: fontSize,
+                    ),
+                  ),
+                  onPressed: () {
+                    showBottomSheet();
+                  },
+                ),
               ),
             if (file != null)
-              RaisedButton.icon(
-                icon: Icon(Icons.file_upload),
-                color: Colors.red,
-                textColor: Colors.white,
-                label: Text("みんなにもみせよう！！"),
-                onPressed: () async {
-                  //ここにアップロードするときのこれこれ書いてくれや
-                  var score = await _requestCloudVision(file);
-                  uploadData(score, file);
-                  Navigator.of(context).pop();
-                },
+              SizedBox(
+                width: width,
+                height: height,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.file_upload),
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  label: Text(
+                    "みんなにもみせよう！！",
+                    style: new TextStyle(
+                      fontSize: fontSize,
+                    ),
+                  ),
+                  onPressed: () async {
+                    //ここにアップロードするときのこれこれ書いてくれや
+                    var score = await _requestCloudVision(file);
+                    uploadData(score, file);
+                    Navigator.of(context).pop();
+                  },
+                ),
               ),
             if (file != null)
-              RaisedButton.icon(
-                icon: Icon(Icons.local_florist),
-                color: Colors.green,
-                textColor: Colors.white,
-                label: Text("ちがうしゃしんにする！"),
-                onPressed: () {
-                  showBottomSheet();
-                },
-              )
+              SizedBox(
+                  width: width,
+                  height: height,
+                  child: RaisedButton.icon(
+                    icon: Icon(Icons.local_florist),
+                    color: Colors.green,
+                    textColor: Colors.white,
+                    label: Text(
+                      "ちがうしゃしんにする！",
+                      style: new TextStyle(
+                        fontSize: fontSize,
+                      ),
+                    ),
+                    onPressed: () {
+                      showBottomSheet();
+                    },
+                  ))
           ],
         ),
       ),
