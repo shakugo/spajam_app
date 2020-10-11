@@ -1,9 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:path/path.dart' as path;
 
 class ImageUploadScreen extends StatefulWidget {
   @override
@@ -12,6 +16,10 @@ class ImageUploadScreen extends StatefulWidget {
 
 class _ImageUploadScreenState extends State<ImageUploadScreen> {
   File file;
+  int score;
+  double width = 300.0;
+  double height = 50.0;
+  double fontSize = 20.0;
 
   Future<int> showCupertinoBottomBar() {
     //選択するためのボトムシートを表示
@@ -53,6 +61,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
     //ボトムシートから受け取った値によって操作を変える
     final result = await showCupertinoBottomBar();
     File imageFile;
+
     if (result == 0) {
       imageFile = await ImageUpload(ImageSource.camera).getImageFromDevice();
     } else if (result == 1) {
@@ -79,21 +88,126 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 width: 300,
                 child: Image.file(file),
               ),
-            RaisedButton.icon(
-              //child: Text('upload'),
-              icon: Icon(Icons.local_florist),
-              color: Colors.green,
-              textColor: Colors.white,
-              label: Text("いまのあさがおをみせて！"),
-              onPressed: () {
-                showBottomSheet();
-              },
-            )
+            if (file == null)
+              SizedBox(
+                width: width,
+                height: height,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.local_florist),
+                  color: Colors.green,
+                  textColor: Colors.white,
+                  label: Text(
+                    "いまのあさがおをみせて！",
+                    style: new TextStyle(
+                      fontSize: fontSize,
+                    ),
+                  ),
+                  onPressed: () {
+                    showBottomSheet();
+                  },
+                ),
+              ),
+            if (file != null)
+              SizedBox(
+                width: width,
+                height: height,
+                child: RaisedButton.icon(
+                  icon: Icon(Icons.file_upload),
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  label: Text(
+                    "みんなにもみせよう！！",
+                    style: new TextStyle(
+                      fontSize: fontSize,
+                    ),
+                  ),
+                  onPressed: () async {
+                    //ここにアップロードするときのこれこれ書いてくれや
+                    var score = await _requestCloudVision(file);
+                    uploadData(score, file);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ),
+            if (file != null)
+              SizedBox(
+                  width: width,
+                  height: height,
+                  child: RaisedButton.icon(
+                    icon: Icon(Icons.local_florist),
+                    color: Colors.green,
+                    textColor: Colors.white,
+                    label: Text(
+                      "ちがうしゃしんにする！",
+                      style: new TextStyle(
+                        fontSize: fontSize,
+                      ),
+                    ),
+                    onPressed: () {
+                      showBottomSheet();
+                    },
+                  ))
           ],
         ),
       ),
     );
   }
+
+  void uploadData(int level, File imageFile) async {
+    Timestamp createdAtTimestamp = Timestamp.fromDate(DateTime.now());
+    var data = {
+      'message': "fullName",
+      'level': level,
+      'image': path.basename(file.path),
+      'date': createdAtTimestamp
+    };
+    DocumentReference diary =
+        await Firestore.instance.collection('diary').add(data);
+    print("uploaded");
+  }
+}
+
+_requestCloudVision(File cameraImage) async {
+  String url = "https://vision.googleapis.com/v1/images:annotate";
+  String apiKey = "";
+  List<int> imageBytes = cameraImage.readAsBytesSync();
+  Map json = {
+    "requests": [
+      {
+        "image": {"content": base64Encode(imageBytes)},
+        "features": [
+          {
+            "type": "LABEL_DETECTION",
+            "maxResults": 10,
+            "model": "builtin/stable"
+          }
+        ],
+        "imageContext": {"languageHints": []}
+      }
+    ]
+  };
+
+  Response response = await http.post(url + "?key=" + apiKey,
+      body: jsonEncode(json), headers: {"Content-Type": "application/json"});
+
+  var body = response.body;
+  //visionapiのレスポンス中身出力
+  int score = 0;
+
+  if (body.contains("Flower")) {
+    print("flower exists");
+    score += 5;
+  } else if (body.contains("Petal")) {
+    print("petal exists");
+    score += 4;
+  } else if (body.contains("Leaf")) {
+    print("leaf exists");
+    score += 3;
+  } else {
+    print("nothin");
+  }
+
+  return score;
 }
 
 //カメラ、ギャラリーからのアップロードはここでやる
