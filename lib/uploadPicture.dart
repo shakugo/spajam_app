@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -6,6 +7,7 @@ import 'package:flutter_native_image/flutter_native_image.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:path/path.dart' as path;
 
 class ImageUploadScreen extends StatefulWidget {
   @override
@@ -102,9 +104,8 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 onPressed: () async {
                   //ここにアップロードするときのこれこれ書いてくれや
                   var score = await _requestCloudVision(file);
-                  setState(() {
-                    score = score;
-                  });
+                  uploadData(score, file);
+                  Navigator.of(context).pop();
                 },
               ),
             if (file != null)
@@ -121,6 +122,19 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
         ),
       ),
     );
+  }
+
+  void uploadData(int level, File imageFile) async {
+    Timestamp createdAtTimestamp = Timestamp.fromDate(DateTime.now());
+    var data = {
+      'message': "fullName",
+      'level': level,
+      'image': path.basename(file.path),
+      'date': createdAtTimestamp
+    };
+    DocumentReference diary =
+        await Firestore.instance.collection('diary').add(data);
+    print("uploaded");
   }
 }
 
@@ -161,7 +175,7 @@ _requestCloudVision(File cameraImage) async {
     print("leaf exists");
     score += 3;
   } else {
-    print("none!!!!!!!!!!!!!");
+    print("nothin");
   }
 
   return score;
