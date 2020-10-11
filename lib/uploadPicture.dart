@@ -3,7 +3,9 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_native_image/flutter_native_image.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 
 class ImageUploadScreen extends StatefulWidget {
   @override
@@ -12,6 +14,7 @@ class ImageUploadScreen extends StatefulWidget {
 
 class _ImageUploadScreenState extends State<ImageUploadScreen> {
   File file;
+  int score;
 
   Future<int> showCupertinoBottomBar() {
     //選択するためのボトムシートを表示
@@ -53,6 +56,7 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
     //ボトムシートから受け取った値によって操作を変える
     final result = await showCupertinoBottomBar();
     File imageFile;
+
     if (result == 0) {
       imageFile = await ImageUpload(ImageSource.camera).getImageFromDevice();
     } else if (result == 1) {
@@ -79,28 +83,31 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
                 width: 300,
                 child: Image.file(file),
               ),
-            if(file == null)
+            if (file == null)
               RaisedButton.icon(
-              icon: Icon(Icons.local_florist),
-              color: Colors.green,
-              textColor: Colors.white,
-              label: Text("いまのあさがおをみせて！"),
-              onPressed: () {
-                showBottomSheet();
-              },
-            ),
-            if(file != null)
+                icon: Icon(Icons.local_florist),
+                color: Colors.green,
+                textColor: Colors.white,
+                label: Text("いまのあさがおをみせて！"),
+                onPressed: () {
+                  showBottomSheet();
+                },
+              ),
+            if (file != null)
               RaisedButton.icon(
                 icon: Icon(Icons.file_upload),
                 color: Colors.red,
                 textColor: Colors.white,
                 label: Text("みんなにもみせよう！！"),
-                onPressed: () {
+                onPressed: () async {
                   //ここにアップロードするときのこれこれ書いてくれや
-                  print("upload");
+                  var score = await _requestCloudVision(file);
+                  setState(() {
+                    score = score;
+                  });
                 },
               ),
-            if(file != null)
+            if (file != null)
               RaisedButton.icon(
                 icon: Icon(Icons.local_florist),
                 color: Colors.green,
@@ -115,6 +122,49 @@ class _ImageUploadScreenState extends State<ImageUploadScreen> {
       ),
     );
   }
+}
+
+_requestCloudVision(File cameraImage) async {
+  String url = "https://vision.googleapis.com/v1/images:annotate";
+  String apiKey = "";
+  List<int> imageBytes = cameraImage.readAsBytesSync();
+  Map json = {
+    "requests": [
+      {
+        "image": {"content": base64Encode(imageBytes)},
+        "features": [
+          {
+            "type": "LABEL_DETECTION",
+            "maxResults": 10,
+            "model": "builtin/stable"
+          }
+        ],
+        "imageContext": {"languageHints": []}
+      }
+    ]
+  };
+
+  Response response = await http.post(url + "?key=" + apiKey,
+      body: jsonEncode(json), headers: {"Content-Type": "application/json"});
+
+  var body = response.body;
+  //visionapiのレスポンス中身出力
+  int score = 0;
+
+  if (body.contains("Flower")) {
+    print("flower exists");
+    score += 5;
+  } else if (body.contains("Petal")) {
+    print("petal exists");
+    score += 4;
+  } else if (body.contains("Leaf")) {
+    print("leaf exists");
+    score += 3;
+  } else {
+    print("none!!!!!!!!!!!!!");
+  }
+
+  return score;
 }
 
 //カメラ、ギャラリーからのアップロードはここでやる
