@@ -96,17 +96,32 @@ class MyHomePage extends StatelessWidget {
     final lastDiary = Diary.fromSnapshot(lastData);
     var _duration = DateTime.now().difference(lastDiary.date).inDays;
     var _durationMessage = '';
+    var imageName = 'images/plants/';
+
     if (_duration < 0) {
       _durationMessage = '今日から';
     } else {
       _durationMessage = '$_duration' + '日目';
     }
+
+    if (diary.level > 10) {
+      imageName = imageName + 'plant5.png';
+    } else if (diary.level > 6) {
+      imageName = imageName + 'plant4.png';
+    } else if (diary.level > 4) {
+      imageName = imageName + 'plant3.png';
+    } else if (diary.level > 2) {
+      imageName = imageName + 'plant2.png';
+    } else {
+      imageName = imageName + 'plant1.png';
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Image.asset(
-            'images/plants/plant1.png',
+            imageName,
             scale: 0.2,
           ),
           Row(
